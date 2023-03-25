@@ -8,6 +8,7 @@ function App() {
   const [messageList, setMessageList] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [openai, setOpenai] = useState()
+  const [synth, setSynth] = useState()
 
   useEffect(() => connectToOpenAi, [])
 
@@ -30,9 +31,16 @@ function App() {
     }
     setMessageList(prev => [...prev, yourMessage, botMessage])
     setIsLoading(false)
+    const utterThis = new SpeechSynthesisUtterance(botMessage.content)
+    const voiceList = synth.getVoices()
+    utterThis.voice = voiceList.find(({name}) => name === 'Microsoft Zira - English (United States)')
+    utterThis.pitch = 2;
+    utterThis.rate = 1.7;
+    synth.speak(utterThis)
   }
 
   const connectToOpenAi = () => {
+    setSynth(window.speechSynthesis)
     setOpenai(new OpenAIApi(new Configuration({
       apiKey: import.meta.env.VITE_API_KEY
     })))
